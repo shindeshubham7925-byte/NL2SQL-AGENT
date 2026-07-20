@@ -21,7 +21,7 @@ class OpenRouterClient:
         self,
         api_key: Optional[str] = None,
         model: Optional[str] = None,
-        base_url: str = "https://openrouter.ai/api/v1"
+        base_url: str = "https://integrate.api.nvidia.com/v1"
     ):
         """
         Initialize OpenRouter client.

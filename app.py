@@ -15,6 +15,7 @@ from src.core.db import (
     get_current_database_path,
     reset_to_default_database
 )
+from src.components.voice_input import render_voice_input
 
 
 def main():
@@ -40,6 +41,7 @@ def main():
         st.session_state.current_schema = None
         st.session_state.db_name = "Default Database (test_db.sqlite)"
         st.session_state.query_history = []
+        st.session_state.query_input = ""
     
     # Sidebar for database connection
     with st.sidebar:
@@ -120,25 +122,33 @@ def main():
     
     # Query input
     st.subheader("💬 Ask Your Question")
-    
+
+    # --- Voice Input Section ---
+    render_voice_input()
+
+    st.markdown("---")
+
+    # Use a dynamic key so we can clear the text area state without StreamlitAPIException
+    query_key = f"query_input_{st.session_state.get('clear_count', 0)}"
     user_query = st.text_area(
-        "Type your query in natural language:",
+        "✏️ Type or edit your query:",
         height=100,
-        placeholder="Example: show all users in the engineering department"
+        placeholder="Example: show all users in the engineering department",
+        key=query_key
     )
-    
-    col1, col2 = st.columns([1, 4])
+
+    col1, col2, col3 = st.columns([2, 2, 5])
     with col1:
         submit_button = st.button("🚀 Generate & Run", type="primary")
     with col2:
         if st.button("🔄 Clear"):
+            st.session_state.clear_count = st.session_state.get("clear_count", 0) + 1
             st.rerun()
-    
     if submit_button:
         if not user_query.strip():
             st.warning("Please enter a query first.")
             return
-        
+
         # Check if API key is configured
         from dotenv import load_dotenv
         load_dotenv()
